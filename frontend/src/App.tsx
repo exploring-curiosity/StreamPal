@@ -6,6 +6,11 @@ const FRAME_INTERVAL_MS = 5000;
 const SUBTITLE_CLEAR_MS = 6000;
 const AUDIO_SAMPLE_RATE = 24000; // Gemini Live native audio is 24kHz PCM
 
+// Backend URLs — configurable via VITE_ env vars for Cloud Run deployment
+const CO_HOST_WS_URL = import.meta.env.VITE_CO_HOST_WS_URL || 'ws://localhost:3000';
+const SOUND_BOARD_URL = import.meta.env.VITE_SOUND_BOARD_URL || 'http://localhost:3001';
+const HYPE_PRODUCER_URL = import.meta.env.VITE_HYPE_PRODUCER_URL || 'http://localhost:3002';
+
 const App: React.FC = () => {
   const [testVideoUrl, setTestVideoUrl] = useState<string | null>(null);
   const [subtitles, setSubtitles] = useState<string>('');
@@ -19,8 +24,6 @@ const App: React.FC = () => {
   const frameIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const subtitleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const audioQueueRef = useRef<AudioBuffer[]>([]);
-  const isPlayingAudioRef = useRef(false);
   const nextPlayTimeRef = useRef(0);
 
   const addActivity = useCallback((agent: string, action: string) => {
@@ -117,7 +120,7 @@ const App: React.FC = () => {
 
   // --- WebSocket + SSE setup ---
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3000');
+    const ws = new WebSocket(CO_HOST_WS_URL);
     coHostWs.current = ws;
 
     ws.onopen = () => addActivity('System', 'Connected to Co-Host');
@@ -139,7 +142,7 @@ const App: React.FC = () => {
     ws.onerror = () => addActivity('System', 'WebSocket error');
     ws.onclose = () => addActivity('System', 'Disconnected from Co-Host');
 
-    const soundEvents = new EventSource('http://localhost:3001/events');
+    const soundEvents = new EventSource(`${SOUND_BOARD_URL}/events`);
     soundEvents.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.type === 'sound') {
@@ -163,7 +166,7 @@ const App: React.FC = () => {
       }
     };
 
-    const visualEvents = new EventSource('http://localhost:3002/events');
+    const visualEvents = new EventSource(`${HYPE_PRODUCER_URL}/events`);
     visualEvents.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.type === 'visual') {
