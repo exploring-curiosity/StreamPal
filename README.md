@@ -2,7 +2,9 @@
 
 A multi-agent AI system that watches your live stream and reacts in real time — roasting bad plays, hyping victories, triggering sound effects, and firing visual overlays. Three autonomous agents coordinate via A2A (Agent-to-Agent) communication to create a fully automated co-host experience.
 
-**Built by Sudharshan Ramesh & Tanish**
+**Built by Sudharshan Ramesh & Tanish Vardhineni**
+
+**sr7431@nyu.edu/sudharshanthunk@gmail.com and tv2291@nyu.edu**
 
 ## How It Works
 
