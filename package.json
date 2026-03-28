@@ -1,0 +1,19 @@
+{
+  "name": "streampal",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:co-host": "cd agents/co-host && npm run dev",
+    "start:sound-board": "cd agents/sound-board && npm run dev",
+    "start:hype-producer": "cd agents/hype-producer && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run start:co-host\" \"npm run start:sound-board\" \"npm run start:hype-producer\" \"npm run start:frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
