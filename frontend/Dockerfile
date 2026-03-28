@@ -14,15 +14,19 @@ ARG VITE_HYPE_PRODUCER_URL
 
 RUN npm run build
 
-# Serve with lightweight node server
-FROM node:20-slim
+# Serve with nginx
+FROM nginx:alpine
 
-WORKDIR /app
-RUN npm install -g serve
+COPY --from=build /app/dist /usr/share/nginx/html
 
-COPY --from=build /app/dist ./dist
+# SPA fallback — route all paths to index.html
+RUN echo 'server { \
+    listen 8080; \
+    location / { \
+        root /usr/share/nginx/html; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
-ENV PORT=8080
 EXPOSE 8080
-
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["nginx", "-g", "daemon off;"]
